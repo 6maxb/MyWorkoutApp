@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { EmptyState } from '@/components/EmptyState';
+import { ExerciseCard } from '@/components/ExerciseCard';
 import { Colors } from '@/constants/Colors';
 import { useSessionDetails } from '@/hooks/useSessionDetails';
 import { useSessionMutations } from '@/hooks/useSessionMutations';
@@ -32,7 +33,7 @@ export default function SessionDetailsScreen() {
   const sessionId = Number(params.id);
   const inputRef = useRef<TextInput | null>(null);
   const { data: session, isLoading, reload } = useSessionDetails(sessionId);
-  const { addExercise, isSaving } = useSessionMutations();
+  const { addExercise, addSetsBatch, isSaving } = useSessionMutations();
   const {
     control,
     handleSubmit,
@@ -50,6 +51,20 @@ export default function SessionDetailsScreen() {
     reset();
     await reload();
   });
+
+  async function handleAddSet(exerciseId: number, values: { weight: number; reps: number }) {
+    await addSetsBatch({
+      exerciseId,
+      sets: [
+        {
+          weight: values.weight,
+          reps: values.reps,
+          isCompleted: false,
+        },
+      ],
+    });
+    await reload();
+  }
 
   if (isLoading) {
     return (
@@ -75,7 +90,7 @@ export default function SessionDetailsScreen() {
         <View style={styles.hero}>
           <Text style={styles.title}>{formatDate(session.date)}</Text>
           <Text style={styles.body}>
-            {session.exercises.length} exercices dans cette séance.
+            {session.exercises.length} exercices · {session.totalSets} séries · {Math.round(session.totalVolume)} kg
           </Text>
           {session.comment ? <Text style={styles.comment}>{session.comment}</Text> : null}
         </View>
@@ -128,9 +143,12 @@ export default function SessionDetailsScreen() {
           <EmptyState description="Ajoute un exercice à la séance." title="Aucun exercice dans cette séance" />
         ) : (
           session.exercises.map((exercise) => (
-            <View key={exercise.id} style={styles.exerciseCard}>
-              <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-            </View>
+            <ExerciseCard
+              exercise={exercise}
+              isSaving={isSaving}
+              key={exercise.id}
+              onAddSet={handleAddSet}
+            />
           ))
         )}
       </ScrollView>
@@ -180,20 +198,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     marginTop: 10,
-  },
-  exerciseCard: {
-    backgroundColor: Colors.surface,
-    borderColor: Colors.border,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 12,
-    padding: 16,
-    ...Colors.shadow,
-  },
-  exerciseTitle: {
-    color: Colors.text,
-    fontSize: 16,
-    fontWeight: '600',
   },
   content: {
     paddingBottom: 120,

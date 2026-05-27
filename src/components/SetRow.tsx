@@ -5,11 +5,10 @@ import type { WorkoutSet } from '@/db/types';
 
 type SetRowProps = {
   index: number;
-  onToggle: () => void;
   set: WorkoutSet;
 };
 
-function SetRowComponent({ index, onToggle, set }: SetRowProps) {
+function SetRowComponent({ index, set }: SetRowProps) {
   return (
     <View style={styles.row}>
       <View>
@@ -18,20 +17,6 @@ function SetRowComponent({ index, onToggle, set }: SetRowProps) {
           {set.weight} kg x {set.reps} reps
         </Text>
       </View>
-
-      <Pressable
-        hitSlop={10}
-        onPress={onToggle}
-        style={({ pressed }) => [
-          styles.toggle,
-          set.isCompleted ? styles.toggleCompleted : null,
-          pressed ? styles.togglePressed : null,
-        ]}
-      >
-        <Text style={[styles.toggleLabel, set.isCompleted ? styles.toggleLabelCompleted : null]}>
-          {set.isCompleted ? 'Complétée' : 'À faire'}
-        </Text>
-      </Pressable>
     </View>
   );
 }
@@ -58,25 +43,5 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontSize: 15,
     fontWeight: '600',
-  },
-  toggle: {
-    backgroundColor: Colors.primaryMuted,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  toggleCompleted: {
-    backgroundColor: '#d8ead8',
-  },
-  toggleLabel: {
-    color: Colors.primary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  toggleLabelCompleted: {
-    color: Colors.success,
-  },
-  togglePressed: {
-    opacity: 0.7,
   },
 });

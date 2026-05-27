@@ -29,7 +29,9 @@ function SessionListItemComponent({ session }: SessionListItemProps) {
       <View style={styles.row}>
         <View style={styles.content}>
           <Text style={styles.title}>{formatDate(session.date)}</Text>
-          <Text style={styles.meta}>{session.exerciseCount} exercices</Text>
+          <Text style={styles.meta}>
+            {session.exerciseCount} exercices · {session.totalSets} séries
+          </Text>
           {session.comment ? <Text style={styles.comment}>{session.comment}</Text> : null}
         </View>
       </View>
