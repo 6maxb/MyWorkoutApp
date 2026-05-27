@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams } from 'expo-router';
 import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -33,7 +34,7 @@ export default function SessionDetailsScreen() {
   const sessionId = Number(params.id);
   const inputRef = useRef<TextInput | null>(null);
   const { data: session, isLoading, reload } = useSessionDetails(sessionId);
-  const { addExercise, addSetsBatch, isSaving } = useSessionMutations();
+  const { addExercise, addSetsBatch, isSaving, toggleSetCompleted } = useSessionMutations();
   const {
     control,
     handleSubmit,
@@ -66,6 +67,14 @@ export default function SessionDetailsScreen() {
     await reload();
   }
 
+  async function handleToggleSet(setId: number, nextValue: boolean) {
+    await toggleSetCompleted(setId, nextValue);
+    if (nextValue) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    await reload();
+  }
+
   if (isLoading) {
     return (
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
@@ -91,6 +100,9 @@ export default function SessionDetailsScreen() {
           <Text style={styles.title}>{formatDate(session.date)}</Text>
           <Text style={styles.body}>
             {session.exercises.length} exercices · {session.totalSets} séries · {Math.round(session.totalVolume)} kg
+          </Text>
+          <Text style={styles.body}>
+            {session.completedSets} / {session.totalSets} séries complétées
           </Text>
           {session.comment ? <Text style={styles.comment}>{session.comment}</Text> : null}
         </View>
@@ -148,6 +160,7 @@ export default function SessionDetailsScreen() {
               isSaving={isSaving}
               key={exercise.id}
               onAddSet={handleAddSet}
+              onToggleSet={handleToggleSet}
             />
           ))
         )}

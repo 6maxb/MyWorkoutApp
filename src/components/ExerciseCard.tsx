@@ -27,9 +27,10 @@ type ExerciseCardProps = {
   exercise: ExerciseWithSets;
   isSaving: boolean;
   onAddSet: (exerciseId: number, values: { weight: number; reps: number }) => Promise<void>;
+  onToggleSet: (setId: number, nextValue: boolean) => Promise<void>;
 };
 
-function ExerciseCardComponent({ exercise, isSaving, onAddSet }: ExerciseCardProps) {
+function ExerciseCardComponent({ exercise, isSaving, onAddSet, onToggleSet }: ExerciseCardProps) {
   const repsRef = useRef<TextInput | null>(null);
   const {
     control,
@@ -125,7 +126,12 @@ function ExerciseCardComponent({ exercise, isSaving, onAddSet }: ExerciseCardPro
 
       <View style={styles.setsContainer}>
         {exercise.sets.map((set, index) => (
-          <SetRow index={index} key={set.id} set={set} />
+          <SetRow
+            index={index}
+            key={set.id}
+            onToggle={() => void onToggleSet(set.id, !set.isCompleted)}
+            set={set}
+          />
         ))}
       </View>
     </View>

@@ -89,12 +89,16 @@ export function useSessionDetails(sessionId: number) {
 
       const totalSets = parsedExercises.reduce((total, exercise) => total + exercise.sets.length, 0);
       const totalVolume = parsedExercises.reduce((total, exercise) => total + exercise.totalVolume, 0);
+      const completedSets = parsedExercises.reduce(
+        (total, exercise) => total + exercise.sets.filter((currentSet) => currentSet.isCompleted).length,
+        0
+      );
 
       setSession({
         ...session,
         exercises: parsedExercises,
         totalSets,
-        completedSets: 0,
+        completedSets,
         totalVolume,
       });
     } catch (loadError) {
