@@ -1,0 +1,68 @@
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { EmptyState } from '@/components/EmptyState';
+import { SessionListItem } from '@/components/SessionListItem';
+import { Colors } from '@/constants/Colors';
+import { useSessions } from '@/hooks/useSessions';
+
+export default function HistoryScreen() {
+  const { data: sessions, isLoading } = useSessions();
+
+  return (
+    <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
+      <FlatList
+        ListEmptyComponent={
+          isLoading ? (
+            <ActivityIndicator color={Colors.primary} style={styles.loader} />
+          ) : (
+            <EmptyState
+              description="Tes séances archivées apparaîtront ici avec le volume et le niveau de complétion."
+              title="Pas encore d’historique"
+            />
+          )
+        }
+        ListHeaderComponent={
+          <View style={styles.hero}>
+            <Text style={styles.title}>Archives</Text>
+            <Text style={styles.body}>{sessions.length} séances enregistrées.</Text>
+          </View>
+        }
+        contentContainerStyle={styles.content}
+        data={sessions}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <SessionListItem session={item} />}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  body: {
+    color: Colors.mutedText,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  content: {
+    paddingBottom: 120,
+    paddingHorizontal: 18,
+  },
+  hero: {
+    marginBottom: 22,
+    paddingTop: 10,
+  },
+  loader: {
+    marginTop: 32,
+  },
+  safeArea: {
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
+  title: {
+    color: Colors.text,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+});
