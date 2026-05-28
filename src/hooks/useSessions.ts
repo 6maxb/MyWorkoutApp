@@ -10,6 +10,7 @@ type SessionSummaryRow = {
   comment: string | null;
   exerciseCount: number;
   totalSets: number;
+  completedSets: number;
   totalVolume: number | null;
 };
 
@@ -32,6 +33,7 @@ export function useSessions() {
           s.comment,
           COUNT(DISTINCT e.id) AS exerciseCount,
           COUNT(st.id) AS totalSets,
+          COALESCE(SUM(CASE WHEN st.is_completed = 1 THEN 1 ELSE 0 END), 0) AS completedSets,
           COALESCE(SUM(st.weight * st.reps), 0) AS totalVolume
         FROM sessions s
         LEFT JOIN exercises e ON e.session_id = s.id
@@ -43,7 +45,7 @@ export function useSessions() {
       const parsedSessions = rows.map((row) => ({
         ...row,
         totalSets: row.totalSets,
-        completedSets: 0,
+        completedSets: row.completedSets,
         totalVolume: row.totalVolume ?? 0,
       }));
 

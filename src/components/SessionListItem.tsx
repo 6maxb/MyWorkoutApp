@@ -19,6 +19,11 @@ function formatDate(value: string) {
 
 function SessionListItemComponent({ session }: SessionListItemProps) {
   const router = useRouter();
+  let secondaryLine = `${session.exerciseCount} exercices · ${session.totalSets} séries`;
+
+  if (session.totalSets > 0) {
+    secondaryLine = `${session.exerciseCount} exercices · ${session.completedSets}/${session.totalSets} séries`;
+  }
 
   return (
     <Pressable
@@ -29,10 +34,12 @@ function SessionListItemComponent({ session }: SessionListItemProps) {
       <View style={styles.row}>
         <View style={styles.content}>
           <Text style={styles.title}>{formatDate(session.date)}</Text>
-          <Text style={styles.meta}>
-            {session.exerciseCount} exercices · {session.totalSets} séries
-          </Text>
+          <Text style={styles.meta}>{secondaryLine}</Text>
+          {session.duration ? <Text style={styles.meta}>{session.duration} min</Text> : null}
           {session.comment ? <Text style={styles.comment}>{session.comment}</Text> : null}
+        </View>
+        <View style={styles.badge}>
+          <Text style={styles.badgeValue}>{Math.round(session.totalVolume)} kg</Text>
         </View>
       </View>
     </Pressable>
@@ -42,6 +49,20 @@ function SessionListItemComponent({ session }: SessionListItemProps) {
 export const SessionListItem = memo(SessionListItemComponent);
 
 const styles = StyleSheet.create({
+  badge: {
+    alignItems: 'center',
+    backgroundColor: Colors.primaryMuted,
+    borderRadius: 12,
+    justifyContent: 'center',
+    minWidth: 84,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  badgeValue: {
+    color: Colors.primary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
   card: {
     backgroundColor: Colors.surface,
     borderColor: Colors.border,
@@ -71,6 +92,7 @@ const styles = StyleSheet.create({
   },
   row: {
     alignItems: 'center',
+    flexDirection: 'row',
   },
   title: {
     color: Colors.text,

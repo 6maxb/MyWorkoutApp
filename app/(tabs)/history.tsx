@@ -8,6 +8,19 @@ import { useSessions } from '@/hooks/useSessions';
 
 export default function HistoryScreen() {
   const { data: sessions, isLoading } = useSessions();
+  let averageVolume = 0;
+  let completionRate = 0;
+
+  if (sessions.length > 0) {
+    const totalVolume = sessions.reduce((sum, session) => sum + session.totalVolume, 0);
+    const totalSets = sessions.reduce((sum, session) => sum + session.totalSets, 0);
+    const completedSets = sessions.reduce((sum, session) => sum + session.completedSets, 0);
+
+    averageVolume = Math.round(totalVolume / sessions.length);
+    if (totalSets > 0) {
+      completionRate = Math.round((completedSets / totalSets) * 100);
+    }
+  }
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
@@ -26,6 +39,8 @@ export default function HistoryScreen() {
           <View style={styles.hero}>
             <Text style={styles.title}>Archives</Text>
             <Text style={styles.body}>{sessions.length} séances enregistrées.</Text>
+            <Text style={styles.body}>Volume moyen : {averageVolume} kg</Text>
+            <Text style={styles.body}>Séries complétées : {completionRate}%</Text>
           </View>
         }
         contentContainerStyle={styles.content}

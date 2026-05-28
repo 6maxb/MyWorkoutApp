@@ -72,9 +72,7 @@ export default function TodayScreen() {
   let latestSummary = 'Aucune séance encore enregistrée.';
 
   if (latestSession) {
-    latestSummary = `${latestSession.exerciseCount} exercices · ${latestSession.totalSets} séries · ${Math.round(
-      latestSession.totalVolume
-    )} kg`;
+    latestSummary = `${latestSession.exerciseCount} exercices · ${latestSession.completedSets}/${latestSession.totalSets} séries · ${Math.round(latestSession.totalVolume)} kg`;
   }
 
   const submit = handleSubmit(async (values) => {
