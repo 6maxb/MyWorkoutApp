@@ -25,6 +25,7 @@ Le projet a pour objectif de proposer un suivi d'entraînement simple et rapide 
 - ajout dynamique d'exercices ;
 - ajout de séries avec poids et répétitions ;
 - marquage des séries comme complétées ;
+- objectif hebdomadaire de 3 séances avec progression ;
 - retour haptique lors de la complétion ;
 - historique des séances ;
 - statistiques simples sur les séances ;

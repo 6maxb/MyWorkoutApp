@@ -12,6 +12,14 @@ export type SessionSummary = SessionRow & {
   totalVolume: number;
 };
 
+export type WeeklyGoalProgress = {
+  goal: number;
+  completed: number;
+  remaining: number;
+  progressPercent: number;
+  weekLabel: string;
+};
+
 export type WorkoutSet = {
   id: number;
   exerciseId: number;

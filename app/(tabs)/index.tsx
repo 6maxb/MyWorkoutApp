@@ -49,7 +49,7 @@ export default function TodayScreen() {
   const commentRef = useRef<TextInput | null>(null);
   const exerciseRefs = useRef<Array<TextInput | null>>([]);
   const { createSession, isSaving } = useCreateSession();
-  const { data: sessions, error, isLoading, reload } = useSessions();
+  const { data: sessions, error, isLoading, reload, weeklyGoal } = useSessions();
   const {
     control,
     handleSubmit,
@@ -115,6 +115,29 @@ export default function TodayScreen() {
                 <Text style={styles.sectionTitle}>Nouvelle séance</Text>
                 <Text style={styles.sectionBody}>Dernière séance : {latestSummary}</Text>
                 {error ? <Text style={styles.errorBox}>Impossible de charger les séances locales.</Text> : null}
+
+                <View style={styles.goalCard}>
+                  <Text style={styles.goalTitle}>Objectif hebdomadaire</Text>
+                  <Text style={styles.goalMeta}>{weeklyGoal.weekLabel}</Text>
+                  <Text style={styles.goalValue}>
+                    {weeklyGoal.completed} / {weeklyGoal.goal} séances
+                  </Text>
+                  <View style={styles.progressTrack}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {
+                          width: `${weeklyGoal.progressPercent}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.goalMeta}>
+                    {weeklyGoal.remaining === 0
+                      ? 'Objectif atteint pour cette semaine.'
+                      : `Il reste ${weeklyGoal.remaining} séance${weeklyGoal.remaining > 1 ? 's' : ''} pour atteindre l'objectif.`}
+                  </Text>
+                </View>
 
                 <View style={styles.formStack}>
                   <View>
@@ -280,6 +303,32 @@ const styles = StyleSheet.create({
   formStack: {
     rowGap: 16,
   },
+  goalCard: {
+    backgroundColor: Colors.card,
+    borderColor: Colors.border,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 18,
+    padding: 14,
+  },
+  goalMeta: {
+    color: Colors.mutedText,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  goalTitle: {
+    color: Colors.text,
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  goalValue: {
+    color: Colors.primary,
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+    marginTop: 4,
+  },
   headerContent: {
     paddingBottom: 8,
   },
@@ -316,6 +365,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 18,
     ...Colors.shadow,
+  },
+  progressFill: {
+    backgroundColor: Colors.primary,
+    borderRadius: 999,
+    height: '100%',
+  },
+  progressTrack: {
+    backgroundColor: Colors.primaryMuted,
+    borderRadius: 999,
+    height: 10,
+    marginBottom: 10,
+    overflow: 'hidden',
   },
   pressed: {
     opacity: 0.7,
