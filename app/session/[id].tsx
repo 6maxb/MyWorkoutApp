@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { EmptyState } from '@/components/EmptyState';
 import { ExerciseCard } from '@/components/ExerciseCard';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { Colors } from '@/constants/Colors';
 import { useSessionDetails } from '@/hooks/useSessionDetails';
 import { useSessionMutations } from '@/hooks/useSessionMutations';
@@ -33,7 +34,7 @@ export default function SessionDetailsScreen() {
   const params = useLocalSearchParams<{ id: string }>();
   const sessionId = Number(params.id);
   const inputRef = useRef<TextInput | null>(null);
-  const { data: session, isLoading, reload } = useSessionDetails(sessionId);
+  const { data: session, error, isLoading, reload } = useSessionDetails(sessionId);
   const { addExercise, addSetsBatch, isSaving, toggleSetCompleted } = useSessionMutations();
   const {
     control,
@@ -87,7 +88,14 @@ export default function SessionDetailsScreen() {
     return (
       <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <View style={styles.content}>
-          <EmptyState description="Cette séance n’existe plus dans la base locale." title="Séance introuvable" />
+          {error ? (
+            <View style={styles.retryBox}>
+              <Text style={styles.body}>Impossible de charger cette séance.</Text>
+              <PrimaryButton label="Réessayer" onPress={() => void reload()} />
+            </View>
+          ) : (
+            <EmptyState description="Cette séance n’existe plus dans la base locale." title="Séance introuvable" />
+          )}
         </View>
       </SafeAreaView>
     );
@@ -106,6 +114,14 @@ export default function SessionDetailsScreen() {
           </Text>
           {session.comment ? <Text style={styles.comment}>{session.comment}</Text> : null}
         </View>
+
+        <Pressable
+          hitSlop={10}
+          onPress={() => void reload()}
+          style={({ pressed }) => [styles.refreshButton, pressed ? styles.pressed : null]}
+        >
+          <Text style={styles.refreshLabel}>Actualiser la séance</Text>
+        </Pressable>
 
         <View style={styles.addExerciseCard}>
           <View style={styles.addExerciseHeader}>
@@ -253,6 +269,22 @@ const styles = StyleSheet.create({
     color: Colors.surface,
     fontSize: 15,
     fontWeight: '700',
+  },
+  refreshButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: Colors.primaryMuted,
+    borderRadius: 12,
+    marginBottom: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  refreshLabel: {
+    color: Colors.primary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  retryBox: {
+    marginTop: 24,
   },
   safeArea: {
     backgroundColor: Colors.background,

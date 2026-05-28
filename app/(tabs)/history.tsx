@@ -2,12 +2,13 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/EmptyState';
+import { PrimaryButton } from '@/components/PrimaryButton';
 import { SessionListItem } from '@/components/SessionListItem';
 import { Colors } from '@/constants/Colors';
 import { useSessions } from '@/hooks/useSessions';
 
 export default function HistoryScreen() {
-  const { data: sessions, isLoading } = useSessions();
+  const { data: sessions, error, isLoading, reload } = useSessions();
   let averageVolume = 0;
   let completionRate = 0;
 
@@ -28,6 +29,11 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           isLoading ? (
             <ActivityIndicator color={Colors.primary} style={styles.loader} />
+          ) : error ? (
+            <View style={styles.retryBox}>
+              <Text style={styles.body}>Impossible de charger l'historique.</Text>
+              <PrimaryButton label="Réessayer" onPress={() => void reload()} />
+            </View>
           ) : (
             <EmptyState
               description="Tes séances archivées apparaîtront ici avec le volume et le niveau de complétion."
@@ -46,7 +52,9 @@ export default function HistoryScreen() {
         contentContainerStyle={styles.content}
         data={sessions}
         keyExtractor={(item) => item.id.toString()}
+        onRefresh={() => void reload()}
         renderItem={({ item }) => <SessionListItem session={item} />}
+        refreshing={isLoading}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
@@ -69,6 +77,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 32,
+  },
+  retryBox: {
+    marginTop: 24,
   },
   safeArea: {
     backgroundColor: Colors.background,

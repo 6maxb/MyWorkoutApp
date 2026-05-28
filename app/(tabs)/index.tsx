@@ -49,7 +49,7 @@ export default function TodayScreen() {
   const commentRef = useRef<TextInput | null>(null);
   const exerciseRefs = useRef<Array<TextInput | null>>([]);
   const { createSession, isSaving } = useCreateSession();
-  const { data: sessions, isLoading, reload } = useSessions();
+  const { data: sessions, error, isLoading, reload } = useSessions();
   const {
     control,
     handleSubmit,
@@ -114,6 +114,7 @@ export default function TodayScreen() {
               <View style={styles.panel}>
                 <Text style={styles.sectionTitle}>Nouvelle séance</Text>
                 <Text style={styles.sectionBody}>Dernière séance : {latestSummary}</Text>
+                {error ? <Text style={styles.errorBox}>Impossible de charger les séances locales.</Text> : null}
 
                 <View style={styles.formStack}>
                   <View>
@@ -231,7 +232,9 @@ export default function TodayScreen() {
           contentContainerStyle={styles.listContent}
           data={sessions}
           keyExtractor={(item) => item.id.toString()}
+          onRefresh={() => void reload()}
           renderItem={({ item }) => <SessionListItem session={item} />}
+          refreshing={isLoading}
           showsVerticalScrollIndicator={false}
         />
       </KeyboardAvoidingView>
@@ -244,6 +247,17 @@ const styles = StyleSheet.create({
     color: Colors.danger,
     fontSize: 12,
     marginTop: 6,
+  },
+  errorBox: {
+    backgroundColor: '#fde7e5',
+    borderColor: '#f5c2bd',
+    borderRadius: 12,
+    borderWidth: 1,
+    color: Colors.danger,
+    fontSize: 13,
+    marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   exerciseFieldRow: {
     alignItems: 'flex-start',
