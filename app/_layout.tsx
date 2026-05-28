@@ -21,7 +21,13 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="session/[id]" options={{ title: 'Séance' }} />
+          <Stack.Screen
+            name="session/[id]"
+            options={{
+              headerBackTitle: 'Retour',
+              title: 'Séance',
+            }}
+          />
         </Stack>
       </DatabaseProvider>
     </GestureHandlerRootView>
