@@ -4,7 +4,7 @@
 
 MyWorkoutApp est une application mobile développée en React Native avec Expo.
 
-Le projet a pour objectif de proposer un suivi d'entraînement simple et rapide pendant une séance de musculation. L'utilisateur peut créer une séance, ajouter des exercices, enregistrer des séries avec poids et répétitions, marquer les séries comme complétées et consulter l'historique des séances.
+Le projet a pour objectif de proposer un suivi d'entraînement simple et rapide pendant une séance de musculation. L'utilisateur peut créer une séance, ajouter des exercices, enregistrer des séries avec poids et répétitions, marquer les séries comme complétées, consulter l'historique des séances et suivre un objectif hebdomadaire de séances.
 
 ## Stack utilisée
 
@@ -99,14 +99,42 @@ Toutes les données sont stockées localement dans SQLite. Il n'y a donc pas de 
 
 ## Architecture
 
-- `app/` : routes Expo Router ;
-- `app/(tabs)/` : écrans principaux Aujourd'hui et Archives ;
-- `app/session/[id].tsx` : détail d'une séance ;
-- `src/components/` : composants réutilisables ;
-- `src/constants/` : constantes visuelles ;
-- `src/context/` : provider SQLite ;
-- `src/db/` : types et migrations SQLite ;
-- `src/hooks/` : logique d'accès aux données.
+- `app/` : routes Expo Router et layouts de navigation.
+- `app/(tabs)/index.tsx` : écran `Aujourd'hui`, création d'une séance, résumé de la dernière séance et affichage de l'objectif hebdomadaire.
+- `app/(tabs)/history.tsx` : écran `Archives`, liste des séances enregistrées et statistiques simples.
+- `app/session/[id].tsx` : détail d'une séance, affichage des exercices et ajout de séries.
+- `src/components/` : composants réutilisables d'interface, par exemple les cartes de séance, les états vides et les boutons.
+- `src/constants/Colors.ts` : couleurs partagées et styles d'ombre selon la plateforme.
+- `src/context/DatabaseProvider.tsx` : provider SQLite placé à la racine de l'application.
+- `src/db/migrations.ts` : initialisation de SQLite, `foreign_keys`, `journal_mode = WAL` et création des tables.
+- `src/db/types.ts` : types TypeScript des séances, exercices, séries et progression hebdomadaire.
+- `src/hooks/useCreateSession.ts` : création d'une séance avec transaction SQLite.
+- `src/hooks/useSessions.ts` : chargement de l'historique, calcul des statistiques et calcul de l'objectif hebdomadaire.
+- `src/hooks/useSessionDetails.ts` : chargement détaillé d'une séance avec ses exercices et ses séries.
+- `src/hooks/useSessionMutations.ts` : ajout d'exercices, ajout de séries et mise à jour des séries complétées.
+
+## Flux de données
+
+### Création d'une séance
+
+1. L'utilisateur remplit le formulaire sur l'écran `Aujourd'hui`.
+2. `React Hook Form` récupère les valeurs du formulaire.
+3. `Zod` valide les données avant enregistrement.
+4. `useCreateSession` enregistre la séance et les exercices dans SQLite via une transaction.
+5. L'application redirige ensuite vers `app/session/[id].tsx`.
+
+### Chargement de l'historique et de l'objectif hebdomadaire
+
+1. `useSessions` charge toutes les séances depuis SQLite.
+2. Le hook calcule les statistiques simples affichées dans l'historique.
+3. Le même hook calcule aussi l'objectif hebdomadaire en comptant les séances de la semaine en cours.
+4. L'écran `Aujourd'hui` affiche la progression vers l'objectif de `3` séances.
+
+### Détail d'une séance
+
+1. L'identifiant de la séance est lu depuis la route dynamique.
+2. `useSessionDetails` charge la séance, ses exercices et ses séries.
+3. `useSessionMutations` permet d'ajouter un exercice, d'ajouter des séries et de marquer une série comme complétée.
 
 ## Vérification
 
@@ -118,7 +146,6 @@ npx tsc --noEmit
 
 ## Remise
 
-Le dossier de remise est présent à la racine du projet :
+Le dossier de remise est présent à la racine du projet au format PDF :
 
-- `DOSSIER_REMISE.md`
 - `DOSSIER_REMISE.pdf`
